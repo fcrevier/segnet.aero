@@ -7,6 +7,7 @@ import argparse
 import math
 import pylab
 import time
+import pdb
 from sklearn.preprocessing import normalize
 caffe_root = '/home/tobyb/ML/caffe-segnet-cudnn5/' 			# Change this to the absolute directoy to SegNet Caffe
 import sys
@@ -27,6 +28,10 @@ net = caffe.Net(args.model,
                 args.weights,
                 caffe.TEST)
 
+error = 0
+notroad = 0
+roadaccuracy = 0
+count = args.iter
 
 for i in range(0, args.iter): #how many images to do
 
@@ -37,10 +42,18 @@ for i in range(0, args.iter): #how many images to do
 
 	image = net.blobs['data'].data
 	label = net.blobs['label'].data
-	predicted = net.blobs['prob'].data
+	predicted = net.blobs['prob'].data #softmax prediction values 1x2x375x375
+	notroad += np.sum(label) / (375*375)
 	image = np.squeeze(image[0,:,:,:])
 	output = np.squeeze(predicted[0,:,:,:])
-	ind = np.argmax(output, axis=0)
+	ind = np.argmax(output, axis=0) #1x375x375 index classes
+	label_squeezed = np.squeeze(label[0,:,:,:])
+	error += np.sum(abs(label_squeezed-ind)/(375*375))
+	if np.sum(label) > 0: #only proceeds if there's any road on true label
+		roadaccuracy += np.sum(ind[label_squeezed.astype(bool)])/(np.sum(label_squeezed))
+	else:
+		count -= 1
+	#pdb.set_trace()
 
 	r = ind.copy()
 	g = ind.copy()
@@ -79,14 +92,19 @@ for i in range(0, args.iter): #how many images to do
 
 	#scipy.misc.toimage(rgb, cmin=0.0, cmax=255).save(IMAGE_FILE+'_segnet.png')
 
-	plt.figure()
-	plt.imshow(image,vmin=0, vmax=1)
-	plt.figure()
-	plt.imshow(rgb_gt,vmin=0, vmax=1)
-	plt.figure()
-	plt.imshow(rgb,vmin=0, vmax=1)
-	plt.show()
+	if True:
+		plt.figure()
+		plt.imshow(image,vmin=0, vmax=1)
+		plt.figure()
+		plt.imshow(rgb_gt,vmin=0, vmax=1)
+		plt.figure()
+		plt.imshow(rgb,vmin=0, vmax=1)
+		plt.show()
 
 
 print 'Success!'
+
+print('Avg acc: %.2f' % (1-error/args.iter))
+print('Avg truth not road percent: %.2f' % (1- notroad/args.iter))
+print('Avg road accuracy: %.2f' % (roadaccuracy/count))
 
