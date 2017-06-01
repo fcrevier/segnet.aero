@@ -4,7 +4,9 @@ CS231N - Project
 
 ## Use docker for workflow. (change gpu to cpu for the cpu version)
 download my docker of caffe_segnet:
+
 `sudo docker pull buckleytoby/caffe_segnet:gpu`
+
 get docker image id:
 
 `sudo docker images`
