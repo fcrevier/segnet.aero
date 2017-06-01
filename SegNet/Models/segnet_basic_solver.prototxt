@@ -11,5 +11,5 @@ momentum: 0.9
 max_iter: 2000
 weight_decay: 0.0005
 snapshot: 200
-snapshot_prefix: "/home/tobyb/ML/cs231nProject/SegNet/Models/Training/proj"  	# Change this to the absolute path to where you wish to output solver snapshots
+snapshot_prefix: "/home/tobyb/ML/cs231nProject/SegNet/Models/Training/basic_weights_bigData"  	# Change this to the absolute path to where you wish to output solver snapshots
 solver_mode: GPU

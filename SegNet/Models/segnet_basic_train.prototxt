@@ -497,9 +497,9 @@ layer {
   top: "loss"
   softmax_param {engine: CAFFE}
   loss_param: {
-    weight_by_label_freqs: false
-    class_weighting: 1
-    class_weighting: 1
+    weight_by_label_freqs: true
+    class_weighting: 0.2
+    class_weighting: 0.8
   }
 }
 layer {
