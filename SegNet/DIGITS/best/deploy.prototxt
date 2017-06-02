@@ -1,0 +1,154 @@
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 375
+  dim: 375
+}
+layer {
+  name: "norm"
+  type: "LRN"
+  bottom: "data"
+  top: "norm"
+  lrn_param {
+    local_size: 5
+    alpha: 0.0001
+    beta: 0.75
+  }
+}
+layer {
+  name: "conv1"
+  type: "Convolution"
+  bottom: "norm"
+  top: "conv1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 4
+    pad: 3
+    kernel_size: 7
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv1_bn"
+  type: "BN"
+  bottom: "conv1"
+  top: "conv1"
+  bn_param {
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
+  }
+}
+layer {
+  name: "relu1"
+  type: "ReLU"
+  bottom: "conv1"
+  top: "conv1"
+}
+layer {
+  name: "pool1"
+  type: "Pooling"
+  bottom: "conv1"
+  top: "pool1"
+  top: "pool1_mask"
+  pooling_param {
+    pool: MAX
+    kernel_size: 2
+    stride: 2
+  }
+}
+layer {
+  name: "upsample1"
+  type: "Upsample"
+  bottom: "pool1"
+  bottom: "pool1_mask"
+  top: "upsample1"
+  upsample_param {
+    scale: 2
+    upsample_h: 375
+    upsample_w: 375
+  }
+}
+layer {
+  name: "conv_decode1"
+  type: "Convolution"
+  bottom: "upsample1"
+  top: "conv_decode1"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 4
+    pad: 3
+    kernel_size: 7
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
+layer {
+  name: "conv_decode1_bn"
+  type: "BN"
+  bottom: "conv_decode1"
+  top: "conv_decode1"
+  bn_param {
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    shift_filler {
+      type: "constant"
+      value: 0.001
+    }
+  }
+}
+layer {
+  name: "conv_classifier"
+  type: "Convolution"
+  bottom: "conv_decode1"
+  top: "conv_classifier"
+  param {
+    lr_mult: 1.0
+    decay_mult: 1.0
+  }
+  param {
+    lr_mult: 2.0
+    decay_mult: 0.0
+  }
+  convolution_param {
+    num_output: 2
+    kernel_size: 1
+    weight_filler {
+      type: "msra"
+    }
+    bias_filler {
+      type: "constant"
+    }
+  }
+}
