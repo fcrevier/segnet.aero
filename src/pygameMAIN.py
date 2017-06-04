@@ -25,7 +25,7 @@ def drawFrame(screen, lines, surf_localMap, surf_outputMap):
     w, h = globalMapRect[2:4]
     drawMapLines(surf_globalMap, globalPoints)
     picGlobal = pygame.Surface((globalOW, globalOH))
-    picGlobal.blit(surf_globalMap, (0,0), (188,188,globalOW-188,globalOH-188))
+    picGlobal.blit(surf_globalMap, (0,0), (188,188,globalOW,globalOH))
 
     #resize global map
     picGlobal = pygame.transform.scale(picGlobal, globalMapRect[2:4])
