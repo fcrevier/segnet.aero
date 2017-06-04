@@ -29,11 +29,10 @@ def pixelstolatlon(px, py, zoom):
 ############################################
 
 # a neighbourhood in Lajeado, Brazil:
-def getMap(x, y, w, h, zoom)
+def getMap(x, y, w, h, zoom):
 
     upperleft =  ','.join((str(y+h), str(x)))
     lowerright = ','.join((str(y), str(x+w)))
-    
     # zoom - be careful not to get too many images!
 
     ############################################
@@ -69,8 +68,6 @@ def getMap(x, y, w, h, zoom)
             dyn = altura * (0.5 + y)
             latn, lonn = pixelstolatlon(ulx + dxn, uly - dyn - bottom/2, zoom)
             position = ','.join((str(latn), str(lonn)))
-            print(x, y, position)
-            pdb.set_trace()
             urlparams = urllib.urlencode({'center': position,
                                           'zoom': str(zoom),
                                           'size': '%dx%d' % (largura, alturaplus),
