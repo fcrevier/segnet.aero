@@ -11,12 +11,22 @@ def initial_state(X0 = 0., Y0 = 0., phi0 = 0., psi0 = 0.):
 
 def next_state(state,state_dot,dt):
 	# first order euler
-	new_state = util.affine(state, state_dot,dt)
+	new_state = util.affine(state, state_dot, dt)
+	X, Y, phi, psi = new_state
+	if psi > 2. * np.pi:
+		psi = np.mod(psi, 2.*np.pi)
+
+	new_state = (X, Y, phi, psi)    
+
 	return new_state
 
-def plant(state, speed, psi_c, K_psi, K_phi, max_bank):
+def plant(state, aircraft, psi_c):
 	# unpack
 	X,Y, phi, psi = state
+	speed = aircraft['speed']
+	max_bank = aircraft['max_bank']
+	K_psi = aircraft['K_psi']
+	K_phi = aircraft['K_phi']
 
 	# velocity
 	Vx = speed*np.cos(psi)
@@ -24,12 +34,12 @@ def plant(state, speed, psi_c, K_psi, K_phi, max_bank):
 	
 	# lateral-directional 
 	err_psi = psi_c - psi
-	phi_c = phi_command = np.maximum(-max_bank,np.minimum(max_bank, K_psi*err_psi))
+	phi_c  = np.maximum(-max_bank,np.minimum(max_bank, K_psi*err_psi))
 	err_phi = phi_c - phi
 	dphi = K_phi * err_phi
 
 	# turn dynamics
-	dpsi = -GRAV*np.tan(phi)
+	dpsi = -GRAV*np.tan(phi)/speed
 	
 	state_dot = (Vx, Vy, dphi, dpsi)
 

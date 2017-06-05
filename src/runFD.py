@@ -5,7 +5,7 @@
 # Scroll wheel: zoom in/out
 import numpy as np
 import matplotlib.pyplot as plt
-import flight_dynamics_simple as fd
+import flightDynamics as fd
 # CONSTANTS
 D2R = np.pi/180.
 

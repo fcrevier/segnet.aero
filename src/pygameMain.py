@@ -1,12 +1,15 @@
+# IMPORT GENERAL PACKAGES
 import os,sys,copy,random,math,time
 import pygame
 from pygame.locals import *
 from PIL import Image, ImageOps
-import stitchMap, GNC, image_tools
 import numpy as np
 import pdb
-os.environ['GLOG_minloglevel'] = '3'
 
+# IMPORT CUSTOM PACKAGES
+import stitchMap, imageTools, segmentation, lineDetection, GNC
+
+# USEFUL FUNCTIONS
 def PIL2surf(img):
     mode = img.mode
     size = img.size
@@ -15,8 +18,7 @@ def PIL2surf(img):
     #pdb.set_trace()
     return surf
 
-
-def drawFrame(screen, lines, surf_localMap, surf_outputMap):
+def drawFrame(screen, lines, surf_loc, surf_seg):
     
     #fill black
     screen.fill((0,0,0))
@@ -34,20 +36,17 @@ def drawFrame(screen, lines, surf_localMap, surf_outputMap):
     #draw local map - includes map lines
     w, h = localMapRect[2:4]
     if lines != None:
-        drawMapLines(surf_localMap, [lines])
-    pic = pygame.transform.scale(surf_localMap, (w,h))
+        drawMapLines(surf_loc, [lines])
+    pic = pygame.transform.scale(surf_loc, (w,h))
     screen.blit(pic, localMapRect)
 
     #draw local map - includes map lines
     w, h = outputMapRect[2:4]
-    pic = pygame.transform.scale(surf_outputMap, (w,h))
-    screen.blit(pic, outputMapRect)
+    if surf_seg != None:
+        pic = pygame.transform.scale(surf_seg, (w,h))
+        screen.blit(pic, outputMapRect)
 
     #add plane to both global and local maps
-
-    
-
-    #draw ML output
 
 
 def drawMapLines(surface, linesGroup):
@@ -80,12 +79,8 @@ def checkXY(x, y):
 
 
 #global params
-long0 = -122 #float(raw_input('lower-left longitude: \n'))
-lat0 =  37.427 #float(raw_input('lower-left latitude: \n'))
-#global_width = 0.01 #degrees longitude
-#global_height = 0.02 #degrees latitude
-#long1 = long0 + global_width
-#lat1 = lat0 + global_height
+long0 = -122 
+lat0 =  37.427
 zoom = 17
 
 #get image of map
@@ -128,6 +123,7 @@ outputMapRect = pygame.Rect(left, upper, width, height)
 
 
 #init
+os.environ['GLOG_minloglevel'] = '3'
 os.environ['SDL_VIDEO_WINDOW_POS'] = '50,50'
 pygame.init()
 #logo=pygame.image.load("logo filename")
@@ -138,7 +134,7 @@ ipics = 0
 
 #machine learning INIT
 globalPoints = []
-net, transformer = cnn_segmentation.initNet()
+net, transformer = segmentation.initNet()
 x0 = (globalW) / 2 #start in middle
 y0 = (globalH) / 2 #start in middle
 state = [x0, y0, 50]  #initial x,y lat. long. position, z=altitude in km
@@ -164,10 +160,27 @@ numY = 20
 #tileMap = initTileMap(globalMap, numX, numY) #tileMap[tilex, tiley] = tile class object
 
 
+# GAME FEATURE SELECTOR
+find_lines = False
+seg_image = False
 
-
-#main loop:
+# MAIN LOOP
+done = False
 while 1:
+    # GET EVENTS
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                done = True
+                break # break out of the for loop
+        
+        elif event.type == pygame.QUIT:
+            done = True
+            break # break out of the for loop
+    if done:
+        break # to break out of the while loop
+
+
     seconds=clock.tick(FPS)/1000.0 #how many seconds passed since previous call
 
     #update the state
@@ -176,29 +189,45 @@ while 1:
     x, y = state[0:2]
     x, y = checkXY(x,y)
 
-    img_local = image_tools.getLocalImage(x, y, globalMap, (375., 375.))
-
+    
     if mapTimer < 1.0 / FPS_map:
         mapTimer += seconds
-    else:
-        #lines = ML_interface.detectLines(indImage, indImage.mode)
-        #lines = ML_interface.splitLines(lines)
-        #dist = ML_interface.getDistError((x,y),lines)
-        #globalLines = ML_interface.getGlobalLines(state, lines)
-        surf_outputMap = PIL2surf(indImage)
-        surf_localMap = PIL2surf(localImage)
+    else:       
+        # local image
+        img_local = imageTools.getLocalImage(x, y, globalMap, (375., 375.))
+        surf_loc = PIL2surf(img_local)
+        
+        # segmented image
+        if seg_image :
+            img_seg = segmentation.segImage(img_local, net, transformer)
+            surf_seg = PIL2surf(img_seg)
+        else:
+            surf_seg = None
+
+        # Find lines
+        if find_lines:
+            lines = lineDetection.detectLines(img_seg, img_seg.mode)
+            lines = lineDetection.splitLines(lines)
+            dist = lineDetection.getDistError((x,y),lines)
+            globalLines = lineDetection.getGlobalLines(state, lines)
+        else:
+            lines = None
+
         print('Updated Map')
+
         mapTimer = 0.0
+
     if globalDrawTimer < 1.0 / FPS_drawGlobal:
         globalDrawTimer += seconds
+   
     else:
-        #globalPoints.append(globalLines)
         globalDrawTimer = 0.0
+
     #get next action from a controller
     action = GNC.getNextAction(state, 0.)
 
     #at end of pygame main loop
-    drawFrame(screen, None, surf_localMap, surf_outputMap)
+    drawFrame(screen, lines = lines, surf_loc = surf_loc, surf_seg = surf_seg)
 
     #pygame.image.save(screen, 'pics\image'+str(ipics)+'.png')
     ipics += 1

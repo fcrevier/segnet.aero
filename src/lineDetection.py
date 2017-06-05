@@ -1,5 +1,4 @@
 # Line detection from segmentation labelling
-from cnn_segmentation import *
 import cv2
 import numpy as np
 import urllib, StringIO
