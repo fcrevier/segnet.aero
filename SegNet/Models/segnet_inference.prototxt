@@ -5,7 +5,7 @@ layer {
   top: "data"
   top: "label"
   dense_image_data_param {
-    source: "/home/tobyb/ML/SegNet/CamVid/test.txt"	# Change this to the absolute path to your data file
+    source: "/home/tobyb/ML/cs231nProject/SegNet/CamVid/test.txt"	# Change this to the absolute path to your data file
     batch_size: 1
   }
 }
@@ -805,8 +805,8 @@ layer {
   bottom: "pool5_mask"
   upsample_param {
     scale: 2
-    upsample_w: 30
-    upsample_h: 23
+    upsample_w: 24
+    upsample_h: 24
   }
 }
 layer {
@@ -986,8 +986,8 @@ layer {
   bottom: "pool4_mask"
   upsample_param {
     scale: 2
-    upsample_w: 60
-    upsample_h: 45
+    upsample_w: 47
+    upsample_h: 47
   }
 }
 layer {
@@ -1466,6 +1466,8 @@ layer {
   bottom: "pool1_mask"
   upsample_param {
     scale: 2
+    upsample_h: 375
+    upsample_w: 375
   }
 }
 layer {
@@ -1544,7 +1546,7 @@ layer {
     bias_filler {
       type: "constant"
     }
-    num_output: 11
+    num_output: 2
     pad: 1
     kernel_size: 3
   }

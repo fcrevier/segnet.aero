@@ -5,7 +5,7 @@ layer {
   top: "data"
   top: "label"
   dense_image_data_param {
-    source: "/home/tobyb/ML/cs231nProject/SegNet/CamVid/train.txt"	# Change this to the absolute path to your data file
+    source: "/home/tobyb/ML/segnet.aero/SegNet/CamVid/train.txt"	# Change this to the absolute path to your data file
     batch_size: 6   			# Change this number to a batch size that will fit on your GPU
     shuffle: true
   }
@@ -497,9 +497,9 @@ layer {
   top: "loss"
   softmax_param {engine: CAFFE}
   loss_param: {
-    weight_by_label_freqs: false
-    class_weighting: 1
-    class_weighting: 1
+    weight_by_label_freqs: true
+    class_weighting: 0.2
+    class_weighting: 0.8
   }
 }
 layer {

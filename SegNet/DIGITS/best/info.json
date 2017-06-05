@@ -1,0 +1,24 @@
+{
+    "caffe flavor": "BVLC",
+    "caffe version": "1.0.0-rc3",
+    "creation time": "2017-06-03 19:45:33.622962",
+    "dataset_id": "20170601-133523-429c",
+    "deploy file": "deploy.prototxt",
+    "digits version": "5.1-dev",
+    "framework": "caffe",
+    "id": "20170603-194533-2cbf",
+    "image dimensions": [
+        375,
+        375,
+        3
+    ],
+    "job id": "20170603-194533-2cbf",
+    "mean file": "mean.binaryproto",
+    "model file": "original.prototxt",
+    "name": "segnet-basic2_5epoch",
+    "snapshot file": "snapshot_iter_10150.caffemodel",
+    "solver file": "solver.prototxt",
+    "status": "Error",
+    "train_val file": "train_val.prototxt",
+    "username": "buckleytoby"
+}
