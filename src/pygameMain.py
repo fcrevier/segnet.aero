@@ -2,7 +2,7 @@ import os,sys,copy,random,math,time
 import pygame
 from pygame.locals import *
 from PIL import Image, ImageOps
-import stitchMap, GNC, ML_interface
+import stitchMap, GNC, image_tools
 import numpy as np
 import pdb
 os.environ['GLOG_minloglevel'] = '3'
@@ -33,7 +33,8 @@ def drawFrame(screen, lines, surf_localMap, surf_outputMap):
 
     #draw local map - includes map lines
     w, h = localMapRect[2:4]
-    drawMapLines(surf_localMap, [lines])
+    if lines != None:
+        drawMapLines(surf_localMap, [lines])
     pic = pygame.transform.scale(surf_localMap, (w,h))
     screen.blit(pic, localMapRect)
 
@@ -137,10 +138,9 @@ ipics = 0
 
 #machine learning INIT
 globalPoints = []
-net, transformer = ML_interface.initNet()
+net, transformer = cnn_segmentation.initNet()
 x0 = (globalW) / 2 #start in middle
-y0 = (globalH) / 2 - 500 #start in middle
-print(x0,y0)
+y0 = (globalH) / 2 #start in middle
 state = [x0, y0, 50]  #initial x,y lat. long. position, z=altitude in km
 action = 0
 offset = 0,0 #idk, must update, function of zoom
@@ -176,18 +176,15 @@ while 1:
     x, y = state[0:2]
     x, y = checkXY(x,y)
 
+    img_local = image_tools.getLocalImage(x, y, globalMap, (375., 375.))
 
-
-
-    predInd, indImage, localImage = \
-            ML_interface.updateMap((x, y), net, transformer, globalMap)
     if mapTimer < 1.0 / FPS_map:
         mapTimer += seconds
     else:
-        lines = ML_interface.detectLines(indImage, indImage.mode)
+        #lines = ML_interface.detectLines(indImage, indImage.mode)
         #lines = ML_interface.splitLines(lines)
-        dist = ML_interface.getDistError((x,y),lines)
-        globalLines = ML_interface.getGlobalLines(state, lines)
+        #dist = ML_interface.getDistError((x,y),lines)
+        #globalLines = ML_interface.getGlobalLines(state, lines)
         surf_outputMap = PIL2surf(indImage)
         surf_localMap = PIL2surf(localImage)
         print('Updated Map')
@@ -195,13 +192,13 @@ while 1:
     if globalDrawTimer < 1.0 / FPS_drawGlobal:
         globalDrawTimer += seconds
     else:
-        globalPoints.append(globalLines)
+        #globalPoints.append(globalLines)
         globalDrawTimer = 0.0
     #get next action from a controller
-    action = GNC.getNextAction(state, dist)
+    action = GNC.getNextAction(state, 0.)
 
     #at end of pygame main loop
-    drawFrame(screen, lines, surf_localMap, surf_outputMap)
+    drawFrame(screen, None, surf_localMap, surf_outputMap)
 
     #pygame.image.save(screen, 'pics\image'+str(ipics)+'.png')
     ipics += 1

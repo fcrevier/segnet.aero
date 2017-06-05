@@ -41,7 +41,7 @@ def turn(state, u_phi, Ixx):
 	Vy = Vnorm*np.sin(psi)
 
 	# turn dynamics	
-	dpsi = GRAV*np.tan(phi)/Vnorm
+	dpsi = -GRAV*np.tan(phi)/Vnorm
 	state_dot = (Vx, Vy, 0.,
 		dphi, 0., dpsi, 
 		0., 0., 0., 		
