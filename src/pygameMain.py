@@ -162,7 +162,7 @@ numY = 20
 
 # GAME FEATURE SELECTOR
 find_lines = False
-seg_image = False
+seg_image = True
 
 # MAIN LOOP
 done = False

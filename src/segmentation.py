@@ -18,7 +18,7 @@ def initNet():
 
 def getSegmented(scores):
     sq = np.squeeze(scores[0,:,:,:]) #2x375x375
-    ind = np.argmax(sq, axis=0)
+    pred_class = np.argmax(sq, axis=0)
     return pred_class
 
 def segImage(img_rgb, net, transformer):
