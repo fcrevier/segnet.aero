@@ -26,6 +26,8 @@ def pDistance(x, y, x1, y1, x2, y2):
 
 
 def getDistError(state, lines):
+    if lines.shape[0] == 0:
+        return lines, 0
     x, y = state
 
     numLines = lines.shape[0]
@@ -38,7 +40,9 @@ def getDistError(state, lines):
             minDist = dist
             idx = i
 
-    return lines[i], minDist
+    #only get first line
+    line = np.expand_dims(lines[i], axis=0)
+    return line, minDist
 
 def affine(t1, t2, alpha):
     if len(t1) != len(t2): 

@@ -1,0 +1,24 @@
+{
+    "caffe flavor": "BVLC",
+    "caffe version": "1.0.0-rc3",
+    "creation time": "2017-06-05 19:17:26.348856",
+    "dataset_id": "20170601-133523-429c",
+    "deploy file": "deploy.prototxt",
+    "digits version": "5.1-dev",
+    "framework": "caffe",
+    "id": "20170605-191726-95fa",
+    "image dimensions": [
+        375,
+        375,
+        3
+    ],
+    "job id": "20170605-191726-95fa",
+    "mean file": "mean.binaryproto",
+    "model file": "original.prototxt",
+    "name": "2layer_16filters_30epoch_lowLearningRate",
+    "snapshot file": "snapshot_iter_30450.caffemodel",
+    "solver file": "solver.prototxt",
+    "status": "Error",
+    "train_val file": "train_val.prototxt",
+    "username": "buckleytoby"
+}

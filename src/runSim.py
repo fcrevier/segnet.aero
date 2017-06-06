@@ -6,6 +6,7 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 import numpy as np
 import matplotlib.pyplot as plt
+import pdb
 
 # IMPORT OBJECT LOADER
 from objFileLoader import *
@@ -30,7 +31,7 @@ viewport = (1500,1000)
 hx = viewport[0]/2
 hy = viewport[1]/2
 srf = pygame.display.set_mode(viewport, OPENGL | DOUBLEBUF)
-zpos = 30
+zpos = 50
 
 # INIT GRAPHICS
 glLightfv(GL_LIGHT0, GL_POSITION,  (-40, 200, 100, 0.0))
@@ -121,6 +122,7 @@ while True:
     # FLIP DISPLAY
     pygame.display.flip()
     ii +=1
+    #pdb.set_trace()
 
 # PLOT HISTORY
 t = np.linspace(0., dt*(ii+1), num = ii) 

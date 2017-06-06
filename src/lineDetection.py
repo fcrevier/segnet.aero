@@ -4,6 +4,7 @@ import numpy as np
 import urllib, StringIO
 from math import log, exp, tan, atan, pi, ceil
 from PIL import Image
+import pdb
 
 b_plotting = False
 
@@ -68,11 +69,13 @@ def detectLines(PILimage, imgType):
         img = cv2.cvtColor(array, cv2.COLOR_RGB2GRAY)
     #set up Hough transform
     minLineLength = 20
-    maxLineGap = 5
+    maxLineGap = 50
     img = cv2.resize(img, (0,0), fx=0.5, fy=0.5)
     array = cv2.resize(array, (0,0), fx=0.5, fy=0.5)
-    lines = cv2.HoughLinesP(img, 1, np.pi/180, 50, lines=np.array([]), \
+    lines = cv2.HoughLinesP(img, 1, 0.1*np.pi/180, 75, lines=np.array([]), \
         minLineLength=minLineLength, maxLineGap=maxLineGap)
+    if lines == None:
+        return np.array([])
     lines = combineHoughLines(lines) 
     numLines = lines.shape[0]
     if False:

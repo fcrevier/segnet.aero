@@ -8,10 +8,11 @@ from PIL import Image
 b_plotting = False
 
 def initNet():
-    deploy_file = '../SegNet/DIGITS/best/deploy.prototxt'
-    caffemodel = '../SegNet/DIGITS/best/snapshot_iter.caffemodel'
-    mean_file = '../SegNet/DIGITS/best/mean.binaryproto'
-    use_gpu = False
+    subFolder = '30epoch'
+    deploy_file = '../SegNet/DIGITS/'+subFolder+'/deploy.prototxt'
+    caffemodel = '../SegNet/DIGITS/'+subFolder+'/snapshot_iter.caffemodel'
+    mean_file = '../SegNet/DIGITS/'+subFolder+'/mean.binaryproto'
+    use_gpu = True
     net = deploy.get_net(caffemodel, deploy_file, use_gpu)
     transformer = deploy.get_transformer(deploy_file, mean_file)
     return net, transformer
