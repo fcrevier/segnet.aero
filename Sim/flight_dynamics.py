@@ -25,13 +25,13 @@ def next_state(state,state_dot,dt):
 def initial_state():
 
 	XYZ = (0.,0.,0.)
-	uvw = (30., 0.,0.)
+	uvw = (10., 0.,0.)
 	euler = (0., 0., 0)
 	euler_dot = (0., 0., 0)
 	state = XYZ + euler + uvw + euler_dot
 	return state
 
-def turn(state, u_phi, Ixx):
+def turn(state, u_phi, Ixx, damp_roll):
 	# unpack
 	X,Y,Z,phi,theta, psi,u,v,w, dphi, dtheta, dpsi = state
 	# velocity
@@ -41,11 +41,11 @@ def turn(state, u_phi, Ixx):
 	Vy = Vnorm*np.sin(psi)
 
 	# turn dynamics	
-	dpsi = GRAV*np.tan(phi)/Vnorm
+	dpsi = -GRAV*np.tan(phi)/Vnorm
 	state_dot = (Vx, Vy, 0.,
 		dphi, 0., dpsi, 
 		0., 0., 0., 		
-		u_phi/Ixx, 0., 0.)
+		u_phi/Ixx - damp_roll*dphi/Ixx, 0., 0.)
 
 	return state_dot
 
@@ -75,7 +75,6 @@ def follow_line(state,prev_node, next_node, weights, K_psi, K_phi, max_bank):
 	
 	# command psi
 	psi_command = vec2heading(weights[0]*PQ + weights[1]*AR)
-	
 	# get state
 	phi = state[3]
 	psi = state[5]
@@ -86,6 +85,7 @@ def follow_line(state,prev_node, next_node, weights, K_psi, K_phi, max_bank):
 	# error on phi
 	phi_command = np.maximum(-max_bank,np.minimum(max_bank, K_psi*err_psi))
 	err_phi = phi_command-phi
+	print phi_command, err_phi
 
 	# control on phi
 	u_phi = K_phi * err_phi
